@@ -31,5 +31,4 @@ Every day, a new practical, zero-cost AI tool or automation prototype is built a
 
 ## 📬 Connect & Community
 - **Instagram:** [@poweredbyvinay](https://instagram.com/poweredbyvinay)
-- **YouTube:** [@poweredbyvinay](https://youtube.com/@poweredbyvinay)
 - **Website:** [poweredbyvinay.com](https://poweredbyvinay.com)
