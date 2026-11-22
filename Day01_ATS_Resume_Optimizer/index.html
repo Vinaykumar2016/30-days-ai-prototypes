@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ATS Resume Architecture & Scoring Engine</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- PDF.js from Mozilla CDN for real client-side PDF parsing -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script>
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+            mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
+          },
+          colors: {
+            surface: {
+              50: '#f8fafc',
+              800: '#1e293b',
+              900: '#0f172a',
+              950: '#090d16',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #090d16; }
+    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #334155; }
+  </style>
+</head>
+<body class="bg-[#090d16] text-slate-200 min-h-screen flex flex-col antialiased selection:bg-slate-700 selection:text-white">
+
+  <!-- Minimalist Enterprise Top Navigation -->
+  <nav class="border-b border-slate-800/80 bg-[#090d16]/90 backdrop-blur sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="h-7 w-7 rounded bg-slate-800 border border-slate-700 flex items-center justify-center font-mono font-semibold text-xs text-slate-100">
+          PV
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="font-semibold text-sm tracking-tight text-white">ATS Architecture Analyzer</span>
+          <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700/60">v1.0.0</span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <span class="text-xs text-slate-400 hidden md:inline-flex items-center gap-1.5 font-mono">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Client-Side Execution • 0 Cloud Storage
+        </span>
+        <a href="https://github.com/Vinaykumar2016/30-days-ai-prototypes" target="_blank" class="text-xs font-mono text-slate-300 hover:text-white bg-slate-900 hover:bg-slate-800 border border-slate-700/80 px-3 py-1.5 rounded transition flex items-center gap-2">
+          <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          Source Code
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Viewport -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8 flex-1 w-full">
+    
+    <!-- Header Context -->
+    <div class="mb-8 border-b border-slate-800 pb-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+      <div>
+        <div class="text-[11px] font-mono tracking-widest text-slate-400 uppercase mb-1.5">Engineering Prototype • Day 01</div>
+        <h1 class="text-2xl font-bold text-white tracking-tight">Enterprise ATS Resume Parser & Health Engine</h1>
+        <p class="text-xs sm:text-sm text-slate-400 mt-1 max-w-2xl">
+          Multi-dimensional evaluation system: extracts raw PDF text, tokenizes job descriptions, checks parsing health, audits quantified metrics, and surfaces critical keyword deficits.
+        </p>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button onclick="loadSampleSuite('sde')" class="text-xs font-mono bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 px-3 py-1.5 rounded transition">
+          Load SDE-1 Suite
+        </button>
+        <button onclick="loadSampleSuite('data')" class="text-xs font-mono bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 px-3 py-1.5 rounded transition">
+          Load Data Analyst Suite
+        </button>
+      </div>
+    </div>
+
+    <!-- Dual Workspace Layout -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      
+      <!-- Inputs (5 Columns) -->
+      <div class="lg:col-span-5 space-y-5">
+        
+        <!-- Job Description Section -->
+        <div class="bg-slate-900/40 border border-slate-800 rounded-lg p-4">
+          <div class="flex items-center justify-between mb-2.5">
+            <label class="text-xs font-semibold text-slate-300 uppercase tracking-wider font-mono flex items-center gap-2">
+              <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span> 01. Target Job Description (JD)
+            </label>
+            <span id="jdWordCount" class="text-[11px] font-mono text-slate-500">0 words</span>
+          </div>
+          <textarea id="jdInput" rows="7" placeholder="Paste the exact job description text from LinkedIn, Naukri, or Careers portal..." class="w-full bg-[#070a10] border border-slate-800 focus:border-slate-600 rounded p-3 text-xs font-mono text-slate-300 placeholder-slate-600 transition resize-none outline-none leading-relaxed"></textarea>
+        </div>
+
+        <!-- Resume Input & Drag-and-Drop Section -->
+        <div class="bg-slate-900/40 border border-slate-800 rounded-lg p-4">
+          <div class="flex items-center justify-between mb-2.5">
+            <label class="text-xs font-semibold text-slate-300 uppercase tracking-wider font-mono flex items-center gap-2">
+              <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span> 02. Candidate Resume Input
+            </label>
+            <span id="resumeWordCount" class="text-[11px] font-mono text-slate-500">0 words</span>
+          </div>
+
+          <!-- Real PDF Drag & Drop Upload Zone -->
+          <div id="dropZone" class="border border-dashed border-slate-800 hover:border-slate-600 bg-[#070a10]/60 rounded p-4 text-center cursor-pointer transition mb-3">
+            <input type="file" id="pdfFileInput" accept=".pdf,.txt" class="hidden">
+            <div class="flex flex-col items-center justify-center">
+              <svg class="w-5 h-5 text-slate-500 mb-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+              <p class="text-xs text-slate-300 font-medium"><span class="text-slate-100 font-semibold underline">Upload PDF / TXT Resume</span> or drag & drop</p>
+              <p id="fileStatus" class="text-[10px] font-mono text-slate-500 mt-0.5">Parsed client-side via Mozilla PDF.js engine</p>
+            </div>
+          </div>
+
+          <!-- Raw Resume Text Area -->
+          <textarea id="resumeInput" rows="8" placeholder="Or paste raw resume text here directly..." class="w-full bg-[#070a10] border border-slate-800 focus:border-slate-600 rounded p-3 text-xs font-mono text-slate-300 placeholder-slate-600 transition resize-none outline-none leading-relaxed"></textarea>
+
+          <button onclick="runAudit()" id="runAuditBtn" class="mt-4 w-full bg-slate-100 hover:bg-white text-slate-950 font-semibold text-xs font-mono py-2.5 rounded border border-white transition flex items-center justify-center gap-2">
+            <span>Execute Comprehensive ATS Audit</span>
+            <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Analysis Dashboard (7 Columns) -->
+      <div class="lg:col-span-7 space-y-5">
+        
+        <!-- Score & Pillar Overview -->
+        <div class="bg-slate-900/40 border border-slate-800 rounded-lg p-5">
+          <div class="flex items-center justify-between border-b border-slate-800/80 pb-4 mb-4">
+            <div>
+              <div class="text-[11px] font-mono text-slate-400 uppercase tracking-wider">Overall ATS Index</div>
+              <div class="flex items-baseline gap-2 mt-0.5">
+                <span id="compositeScore" class="text-3xl font-mono font-bold text-white">--</span>
+                <span class="text-xs font-mono text-slate-500">/ 100</span>
+              </div>
+            </div>
+            <div id="verdictBadge" class="text-xs font-mono px-3 py-1 rounded bg-slate-800 text-slate-400 border border-slate-700">
+              Awaiting Audit
+            </div>
+          </div>
+
+          <!-- 4 Evaluative Pillars -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-left">
+            <div class="p-2.5 bg-[#070a10] border border-slate-800 rounded">
+              <div class="text-[10px] font-mono text-slate-500 uppercase">1. Skill Match</div>
+              <div id="pillarSkills" class="text-sm font-mono font-semibold text-slate-200 mt-1">--%</div>
+              <div class="text-[9px] text-slate-500 mt-0.5">Weight: 40%</div>
+            </div>
+            <div class="p-2.5 bg-[#070a10] border border-slate-800 rounded">
+              <div class="text-[10px] font-mono text-slate-500 uppercase">2. Impact Metrics</div>
+              <div id="pillarMetrics" class="text-sm font-mono font-semibold text-slate-200 mt-1">--%</div>
+              <div class="text-[9px] text-slate-500 mt-0.5">Weight: 25%</div>
+            </div>
+            <div class="p-2.5 bg-[#070a10] border border-slate-800 rounded">
+              <div class="text-[10px] font-mono text-slate-500 uppercase">3. Format Health</div>
+              <div id="pillarFormat" class="text-sm font-mono font-semibold text-slate-200 mt-1">--%</div>
+              <div class="text-[9px] text-slate-500 mt-0.5">Weight: 20%</div>
+            </div>
+            <div class="p-2.5 bg-[#070a10] border border-slate-800 rounded">
+              <div class="text-[10px] font-mono text-slate-500 uppercase">4. Action Verbs</div>
+              <div id="pillarVerbs" class="text-sm font-mono font-semibold text-slate-200 mt-1">--%</div>
+              <div class="text-[9px] text-slate-500 mt-0.5">Weight: 15%</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Detailed Breakdown Tabs -->
+        <div class="bg-slate-900/40 border border-slate-800 rounded-lg p-5">
+          
+          <!-- Tab Navigation -->
+          <div class="flex border-b border-slate-800 gap-4 mb-4 text-xs font-mono">
+            <button onclick="switchTab('keywords')" id="tabBtn-keywords" class="pb-2 border-b-2 border-slate-100 text-white font-medium">Keywords & Gap Analysis</button>
+            <button onclick="switchTab('format')" id="tabBtn-format" class="pb-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200">Parser Diagnostics</button>
+            <button onclick="switchTab('rewrite')" id="tabBtn-rewrite" class="pb-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200">STAR Bullets Engine</button>
+          </div>
+
+          <!-- Tab Content 1: Keywords -->
+          <div id="tab-keywords" class="space-y-4">
+            <div>
+              <div class="flex items-center justify-between text-xs font-mono text-slate-400 mb-2">
+                <span>CRITICAL MISSING KEYWORDS (FROM JD)</span>
+                <span id="missingCount" class="text-[11px] text-rose-400">0 identified</span>
+              </div>
+              <div id="missingKeywordsBox" class="flex flex-wrap gap-1.5 p-3 bg-[#070a10] border border-slate-800 rounded min-h-[48px]">
+                <span class="text-xs font-mono text-slate-600">Run audit to view detected keyword deficits...</span>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex items-center justify-between text-xs font-mono text-slate-400 mb-2">
+                <span>MATCHED CORE COMPETENCIES</span>
+                <span id="matchedCount" class="text-[11px] text-emerald-400">0 matched</span>
+              </div>
+              <div id="matchedKeywordsBox" class="flex flex-wrap gap-1.5 p-3 bg-[#070a10] border border-slate-800 rounded min-h-[48px]">
+                <span class="text-xs font-mono text-slate-600">Run audit to view matched terms...</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab Content 2: Format & Parser Health -->
+          <div id="tab-format" class="hidden space-y-3 font-mono text-xs">
+            <div id="formatHealthList" class="space-y-2">
+              <p class="text-slate-500">Run audit to execute header, contact, and section parser diagnostics...</p>
+            </div>
+          </div>
+
+          <!-- Tab Content 3: STAR Bullets Engine -->
+          <div id="tab-rewrite" class="hidden space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-mono text-slate-400">SYNTHESIZED IMPACT BULLETS (STAR FRAMEWORK)</span>
+              <button onclick="copyGeneratedBullets()" id="copyBulletsBtn" class="text-xs font-mono text-slate-300 hover:text-white bg-slate-800 px-2.5 py-1 rounded border border-slate-700 transition">
+                Copy All
+              </button>
+            </div>
+            <div id="bulletContainer" class="space-y-2.5 text-xs font-mono leading-relaxed bg-[#070a10] p-3.5 border border-slate-800 rounded">
+              <p class="text-slate-600">Generated bullet points weaving candidate skills and missing keywords into measurable STAR statements will render here.</p>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Technical Footer -->
+  <footer class="border-t border-slate-800/80 py-5 bg-[#090d16] text-xs font-mono text-slate-500">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div>
+        <span>Engineered by </span>
+        <a href="https://github.com/Vinaykumar2016" target="_blank" class="text-slate-300 hover:underline">Vinaykumar Mathad (@Vinaykumar2016)</a>
+      </div>
+      <div class="flex items-center gap-4">
+        <span>Part of the 30-Day Engineering Sprint</span>
+        <span>•</span>
+        <a href="https://poweredbyvinay.com" target="_blank" class="text-slate-400 hover:text-white">poweredbyvinay.com</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Core Audit Engine Script -->
+  <script>
+    // State Tracking
+    let parsedResumeText = "";
+
+    // Comprehensive Technical Lexicon for Matching
+    const TECH_DICTIONARY = [
+      "python", "fastapi", "django", "flask", "node.js", "nodejs", "javascript", "typescript", "react", "react.js",
+      "next.js", "nextjs", "vue", "angular", "sql", "postgresql", "mysql", "mongodb", "redis", "caching", "rest api",
+      "restful", "graphql", "microservices", "docker", "kubernetes", "k8s", "aws", "s3", "ec2", "lambda", "cloud",
+      "ci/cd", "github actions", "git", "linux", "algorithms", "data structures", "dsa", "unit testing", "pytest",
+      "jest", "agile", "scrum", "pandas", "numpy", "power bi", "tableau", "etl", "data pipelines", "a/b testing",
+      "statistics", "kafka", "rabbitmq", "tailwind", "css", "html5", "system design", "distributed systems"
+    ];
+
+    const STRONG_ACTION_VERBS = [
+      "architected", "engineered", "spearheaded", "optimized", "implemented", "developed", "deployed", "scaled",
+      "reduced", "increased", "designed", "automated", "streamlined", "accelerated", "refactored", "orchestrated"
+    ];
+
+    const WEAK_VERBS = [
+      "helped", "assisted", "worked on", "responsible for", "participated in", "handled", "did", "supported"
+    ];
+
+    // File Upload Handler (PDF + TXT)
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('pdfFileInput');
+
+    dropZone.addEventListener('click', () => fileInput.click());
+    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('border-slate-400'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('border-slate-400'));
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('border-slate-400');
+      if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+    });
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files.length) handleFile(e.target.files[0]);
+    });
+
+    async function handleFile(file) {
+      document.getElementById('fileStatus').textContent = `Loading & parsing: ${file.name}...`;
+      if (file.type === "application/pdf" || file.name.endsWith('.pdf')) {
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        let fullText = "";
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          const content = await page.getTextContent();
+          const strings = content.items.map(item => item.str);
+          fullText += strings.join(" ") + "\n";
+        }
+        document.getElementById('resumeInput').value = fullText;
+        document.getElementById('fileStatus').textContent = `Successfully extracted ${pdf.numPages} pages from ${file.name}`;
+      } else {
+        const text = await file.text();
+        document.getElementById('resumeInput').value = text;
+        document.getElementById('fileStatus').textContent = `Loaded text file: ${file.name}`;
+      }
+    }
+
+    // Tab Switching
+    function switchTab(tabId) {
+      ['keywords', 'format', 'rewrite'].forEach(id => {
+        document.getElementById(`tab-${id}`).classList.add('hidden');
+        document.getElementById(`tabBtn-${id}`).className = "pb-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200";
+      });
+      document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+      document.getElementById(`tabBtn-${tabId}`).className = "pb-2 border-b-2 border-slate-100 text-white font-medium";
+    }
+
+    // Sample Suite Preloaders
+    const SAMPLE_SUITES = {
+      sde: {
+        jd: `Senior Backend Engineer (SDE-2) - Cloud Systems
+Location: Bengaluru (Hybrid)
+
+Responsibilities:
+- Architect and scale low-latency REST APIs and Microservices handling 100k+ RPS.
+- Strong hands-on proficiency with Python, FastAPI, and PostgreSQL.
+- Implement distributed caching with Redis to optimize database query performance.
+- Containerize services using Docker and orchestrate workloads via Kubernetes.
+- Drive automated CI/CD pipelines on AWS (EC2, S3, Lambda) with robust Unit Testing.
+- Solid grounding in Data Structures, Algorithms, Distributed Systems, and Agile.`,
+        resume: `Vinaykumar Mathad
+Bengaluru, India | hello@poweredbyvinay.com | github.com/Vinaykumar2016
+
+PROFESSIONAL SUMMARY
+Backend developer with 2+ years of experience engineering web services, working with databases, and deploying applications.
+
+TECHNICAL SKILLS
+Languages: Python, JavaScript, SQL
+Frameworks: Flask, HTML5, CSS
+Databases: MySQL, PostgreSQL
+Tools: Git, Linux, Docker
+
+WORK EXPERIENCE
+Software Developer - Enterprise Systems (2023 - Present)
+- Developed REST APIs using Python and Flask to support internal tooling.
+- Helped the team with database query performance and database indexing.
+- Assisted in containerizing two internal services using Docker.
+- Responsible for fixing defects and participating in weekly sprint meetings.
+
+PROJECTS
+High-Throughput Analytics Dashboard:
+- Built a web dashboard using Python and PostgreSQL to display real-time metrics.
+- Integrated Git version control and handled basic deployment on AWS EC2.`
+      },
+      data: {
+        jd: `Data Analyst (Product Analytics)
+Company: FinTech Growth India
+Requirements:
+- Advanced SQL proficiency (Joins, Window Functions, Complex Subqueries, CTEs).
+- Strong data wrangling skills using Python (Pandas, NumPy).
+- Expertise in creating executive BI dashboards via Power BI or Tableau.
+- Understanding of ETL pipelines, Data Warehousing, and Statistical A/B Testing.
+- Excellent communication to translate quantitative metrics into product decisions.`,
+        resume: `Data Associate
+Bangalore | Candidate Portfolio
+Skills: Python, Excel, SQL, Statistics.
+Experience: Handled daily reports in Excel. Wrote basic SQL queries to extract data. Helped the analytics team organize marketing sheets.`
+      }
+    };
+
+    function loadSampleSuite(type) {
+      const suite = SAMPLE_SUITES[type];
+      document.getElementById('jdInput').value = suite.jd;
+      document.getElementById('resumeInput').value = suite.resume;
+      document.getElementById('fileStatus').textContent = `Loaded ${type.toUpperCase()} evaluation suite.`;
+    }
+
+    // Tokenization and Extraction
+    function extractKeywordsFromText(text) {
+      if (!text) return [];
+      const lower = text.toLowerCase();
+      const detected = new Set();
+      TECH_DICTIONARY.forEach(term => {
+        const regex = new RegExp(`\\b${term.replace('.', '\\.')}\\b`, 'i');
+        if (regex.test(lower)) detected.add(term);
+      });
+      return Array.from(detected);
+    }
+
+    // Core Audit Execution
+    function runAudit() {
+      const jd = document.getElementById('jdInput').value.trim();
+      const resume = document.getElementById('resumeInput').value.trim();
+
+      if (!jd || !resume) {
+        alert("Please provide both the Job Description and Resume text (or upload a PDF).");
+        return;
+      }
+
+      // 1. Keyword Gap Analysis
+      const jdTokens = extractKeywordsFromText(jd);
+      const resumeTokens = extractKeywordsFromText(resume);
+
+      const matched = [];
+      const missing = [];
+
+      jdTokens.forEach(t => {
+        if (resumeTokens.includes(t)) matched.push(t);
+        else missing.push(t);
+      });
+
+      const skillScore = jdTokens.length > 0 ? Math.round((matched.length / jdTokens.length) * 100) : 50;
+
+      // 2. Quantified Metrics Audit
+      // Checks for numbers, percentages (%), metrics like "20%", "100k", "40%", "$", "₹"
+      const lines = resume.split('\n').filter(l => l.trim().startsWith('-') || l.trim().startsWith('•') || l.length > 30);
+      let metricCount = 0;
+      const metricRegex = /(\d+[\%kKmMbB]?|\$\d+|\₹\d+|\b\d+\b)/;
+      lines.forEach(line => {
+        if (metricRegex.test(line)) metricCount++;
+      });
+      const metricRatio = lines.length > 0 ? Math.min(100, Math.round((metricCount / lines.length) * 100)) : 20;
+
+      // 3. Format & Header Diagnostics
+      const hasEmail = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/.test(resume);
+      const hasPhone = /(\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/.test(resume) || /\b\d{10}\b/.test(resume);
+      const hasGitHubOrLinkedIn = /(github\.com|linkedin\.com)/i.test(resume);
+      const hasStandardSections = /(experience|skills|education|projects)/i.test(resume);
+      
+      let formatChecksPassed = 0;
+      if (hasEmail) formatChecksPassed++;
+      if (hasPhone) formatChecksPassed++;
+      if (hasGitHubOrLinkedIn) formatChecksPassed++;
+      if (hasStandardSections) formatChecksPassed++;
+      const formatScore = Math.round((formatChecksPassed / 4) * 100);
+
+      // 4. Action Verb Strength Audit
+      let strongVerbCount = 0;
+      let weakVerbCount = 0;
+      const lowerResume = resume.toLowerCase();
+
+      STRONG_ACTION_VERBS.forEach(v => {
+        const r = new RegExp(`\\b${v}\\b`, 'g');
+        const matches = lowerResume.match(r);
+        if (matches) strongVerbCount += matches.length;
+      });
+
+      WEAK_VERBS.forEach(v => {
+        const r = new RegExp(`\\b${v}\\b`, 'g');
+        const matches = lowerResume.match(r);
+        if (matches) weakVerbCount += matches.length;
+      });
+
+      const verbTotal = strongVerbCount + weakVerbCount;
+      const verbScore = verbTotal > 0 ? Math.round((strongVerbCount / verbTotal) * 100) : 40;
+
+      // Composite Weighted Index
+      // Skills: 40%, Metrics: 25%, Format: 20%, Verbs: 15%
+      const composite = Math.round(
+        (skillScore * 0.40) +
+        (metricRatio * 0.25) +
+        (formatScore * 0.20) +
+        (verbScore * 0.15)
+      );
+
+      // Render Overview
+      document.getElementById('compositeScore').textContent = composite;
+      document.getElementById('pillarSkills').textContent = `${skillScore}%`;
+      document.getElementById('pillarMetrics').textContent = `${metricRatio}%`;
+      document.getElementById('pillarFormat').textContent = `${formatScore}%`;
+      document.getElementById('pillarVerbs').textContent = `${verbScore}%`;
+
+      const badge = document.getElementById('verdictBadge');
+      if (composite >= 85) {
+        badge.className = "text-xs font-mono px-3 py-1 rounded bg-emerald-950/80 text-emerald-400 border border-emerald-800";
+        badge.textContent = "High Match • ATS Pass Ready";
+      } else if (composite >= 60) {
+        badge.className = "text-xs font-mono px-3 py-1 rounded bg-amber-950/80 text-amber-400 border border-amber-800";
+        badge.textContent = "Moderate • Optimization Recommended";
+      } else {
+        badge.className = "text-xs font-mono px-3 py-1 rounded bg-rose-950/80 text-rose-400 border border-rose-800";
+        badge.textContent = "Critical Gaps • High Filter Rejection Risk";
+      }
+
+      // Render Keywords
+      document.getElementById('missingCount').textContent = `${missing.length} missing`;
+      document.getElementById('matchedCount').textContent = `${matched.length} matched`;
+
+      const missingBox = document.getElementById('missingKeywordsBox');
+      if (missing.length === 0) {
+        missingBox.innerHTML = `<span class="text-xs font-mono text-emerald-400">All key JD tokens detected in resume text.</span>`;
+      } else {
+        missingBox.innerHTML = missing.map(kw => `
+          <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-mono bg-rose-950/60 text-rose-300 border border-rose-800/80">
+            ! ${kw}
+          </span>
+        `).join('');
+      }
+
+      const matchedBox = document.getElementById('matchedKeywordsBox');
+      matchedBox.innerHTML = matched.map(kw => `
+        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-mono bg-emerald-950/60 text-emerald-300 border border-emerald-800/80">
+          ✓ ${kw}
+        </span>
+      `).join('');
+
+      // Render Format Diagnostics
+      const formatHealthList = document.getElementById('formatHealthList');
+      formatHealthList.innerHTML = `
+        <div class="flex items-center justify-between p-2 rounded bg-[#070a10] border border-slate-800">
+          <span>Candidate Email Header:</span>
+          <span class="${hasEmail ? 'text-emerald-400' : 'text-rose-400'}">${hasEmail ? '✓ Valid Format Detected' : '✕ Missing or Unparseable'}</span>
+        </div>
+        <div class="flex items-center justify-between p-2 rounded bg-[#070a10] border border-slate-800">
+          <span>Phone / Contact Number:</span>
+          <span class="${hasPhone ? 'text-emerald-400' : 'text-rose-400'}">${hasPhone ? '✓ Valid Format Detected' : '✕ Missing Contact'}</span>
+        </div>
+        <div class="flex items-center justify-between p-2 rounded bg-[#070a10] border border-slate-800">
+          <span>GitHub / LinkedIn Links:</span>
+          <span class="${hasGitHubOrLinkedIn ? 'text-emerald-400' : 'text-amber-400'}">${hasGitHubOrLinkedIn ? '✓ Verified Profiles' : '! Recommend Adding Hyperlinks'}</span>
+        </div>
+        <div class="flex items-center justify-between p-2 rounded bg-[#070a10] border border-slate-800">
+          <span>Quantified Impact Ratio:</span>
+          <span class="${metricRatio > 50 ? 'text-emerald-400' : 'text-amber-400'}">${metricCount} out of ${lines.length} bullets contain concrete metrics (${metricRatio}%)</span>
+        </div>
+        <div class="flex items-center justify-between p-2 rounded bg-[#070a10] border border-slate-800">
+          <span>Passive Verbs Flagged:</span>
+          <span class="${weakVerbCount === 0 ? 'text-emerald-400' : 'text-rose-400'}">${weakVerbCount} passive occurrences (e.g. "helped", "worked on")</span>
+        </div>
+      `;
+
+      // Render STAR Bullets
+      const topMissing = missing.slice(0, 3);
+      const topMatched = matched.slice(0, 2);
+      const bulletContainer = document.getElementById('bulletContainer');
+
+      bulletContainer.innerHTML = `
+        <div class="p-2.5 rounded bg-slate-900/80 border border-slate-800">
+          <span class="text-slate-400 block text-[10px] uppercase tracking-wider mb-1">Architecture & Deployment Statement</span>
+          <p class="text-slate-200">
+            • <strong>Architected & Containerized:</strong> Re-engineered core backend microservices utilizing <strong>${topMatched[0] || 'Python'}</strong> and <strong>${topMissing[0] || 'Docker'}</strong>, decreasing cold-start latency by 35% and standardizing CI/CD deployments.
+          </p>
+        </div>
+        <div class="p-2.5 rounded bg-slate-900/80 border border-slate-800">
+          <span class="text-slate-400 block text-[10px] uppercase tracking-wider mb-1">Performance & Scale Statement</span>
+          <p class="text-slate-200">
+            • <strong>High-Throughput Optimization:</strong> Implemented low-latency caching layers with <strong>${topMissing[1] || 'Redis'}</strong> across <strong>${topMatched[1] || 'PostgreSQL'}</strong> database instances, accelerating query response times by 40% under peak load.
+          </p>
+        </div>
+        <div class="p-2.5 rounded bg-slate-900/80 border border-slate-800">
+          <span class="text-slate-400 block text-[10px] uppercase tracking-wider mb-1">Cloud Infrastructure Statement</span>
+          <p class="text-slate-200">
+            • <strong>Production Reliability:</strong> Orchestrated automated testing pipelines and cloud infrastructure on <strong>${topMissing[2] || 'AWS (EC2, S3)'}</strong>, maintaining 99.9% application uptime and cutting defect escape rate by 25%.
+          </p>
+        </div>
+      `;
+    }
+
+    function copyGeneratedBullets() {
+      const text = document.getElementById('bulletContainer').innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = document.getElementById('copyBulletsBtn');
+        btn.textContent = "Copied ✓";
+        setTimeout(() => btn.textContent = "Copy All", 2000);
+      });
+    }
+  </script>
+</body>
+</html>
