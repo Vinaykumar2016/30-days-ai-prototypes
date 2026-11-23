@@ -13,6 +13,7 @@ Every day, a new practical, zero-cost AI tool or automation prototype is built a
 | Day | Prototype Name | Live Web Demo | Source Code | Category |
 | :---: | :--- | :---: | :---: | :---: |
 | **Day 01** | **95% ATS Resume Optimizer** | [Live Tool](https://poweredbyvinay.com/resume) | [Day01_ATS_Resume_Optimizer](./Day01_ATS_Resume_Optimizer) | Career / Productivity |
+| **Day 02** | **Google Maps B2B Lead Extractor** | Local Script | [Day02_Maps_Lead_Scraper](./Day02_Maps_Lead_Scraper) | Freelance / Sales Automation |
 
 ---
 

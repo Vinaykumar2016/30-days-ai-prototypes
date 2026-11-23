@@ -1,0 +1,8 @@
+__pycache__/
+*.py[cod]
+*$py.class
+*.csv
+*.json
+!Day02_Maps_Lead_Scraper/leads_sample.csv
+.DS_Store
+Thumbs.db
