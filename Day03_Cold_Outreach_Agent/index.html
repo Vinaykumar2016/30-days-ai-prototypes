@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Autonomous B2B Outreach & Client Dispatcher | Day 03</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+            mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #090d16; }
+    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #334155; }
+  </style>
+</head>
+<body class="bg-[#090d16] text-slate-200 min-h-screen flex flex-col antialiased selection:bg-slate-700 selection:text-white">
+
+  <!-- Enterprise Nav -->
+  <nav class="border-b border-slate-800/80 bg-[#090d16]/90 backdrop-blur sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="h-7 w-7 rounded bg-slate-800 border border-slate-700 flex items-center justify-center font-mono font-semibold text-xs text-slate-100">
+          PV
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="font-semibold text-sm tracking-tight text-white">Autonomous Cold Outreach Dispatcher</span>
+          <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700/60">Day 03</span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <span class="text-xs text-slate-400 hidden sm:inline-flex items-center gap-1.5 font-mono">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> 1-Click WhatsApp & Email Engine
+        </span>
+        <a href="https://github.com/Vinaykumar2016/30-days-ai-prototypes" target="_blank" class="text-xs font-mono text-slate-300 hover:text-white bg-slate-900 hover:bg-slate-800 border border-slate-700/80 px-3 py-1.5 rounded transition flex items-center gap-2">
+          <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          Python Agent Repo
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Viewport -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8 flex-1 w-full">
+    
+    <!-- Header Context -->
+    <div class="mb-6 border-b border-slate-800 pb-5 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+      <div>
+        <div class="text-[11px] font-mono tracking-widest text-slate-400 uppercase mb-1">Engineering Prototype • Day 03</div>
+        <h1 class="text-2xl font-bold text-white tracking-tight">Autonomous B2B Pitch & Cold Outreach Engine</h1>
+        <p class="text-xs sm:text-sm text-slate-400 mt-1 max-w-2xl">
+          Turns raw scraped lead databases into tailored, high-converting client acquisition campaigns. Automatically detects digital gaps (missing websites, rating bottlenecks) and generates 1-click WhatsApp and Email dispatches.
+        </p>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button onclick="loadSampleCampaign()" class="text-xs font-mono bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 px-3 py-1.5 rounded transition">
+          Load Day 2 Scraped Leads
+        </button>
+        <button onclick="exportCampaignCSV()" class="text-xs font-mono bg-slate-100 hover:bg-white text-slate-950 font-semibold px-3 py-1.5 rounded transition flex items-center gap-1.5">
+          <span>Export Campaign Sheet</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Drag & Drop CSV Uploader -->
+    <div id="dropZone" class="border border-dashed border-slate-800 hover:border-slate-600 bg-slate-900/30 rounded-lg p-4 text-center cursor-pointer transition mb-6">
+      <input type="file" id="csvFileInput" accept=".csv" class="hidden">
+      <div class="flex flex-col items-center justify-center">
+        <svg class="w-5 h-5 text-slate-500 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+        <p class="text-xs text-slate-300 font-medium">Drop any <span class="font-mono text-slate-100 underline">leads.csv</span> (from Day 2 Scraper) to generate instant campaign</p>
+        <p id="csvStatus" class="text-[10px] font-mono text-slate-500 mt-0.5">Parses client-side • 0 Cloud Uploads</p>
+      </div>
+    </div>
+
+    <!-- Dual Viewport: Leads Queue (7 Cols) + Live Pitch Previewer (5 Cols) -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      
+      <!-- Left: Leads Queue (7 Cols) -->
+      <div class="lg:col-span-7 bg-slate-900/40 border border-slate-800 rounded-lg overflow-hidden">
+        <div class="p-3 bg-[#070a10] border-b border-slate-800 flex items-center justify-between text-xs font-mono">
+          <span class="text-slate-400 font-semibold uppercase tracking-wider text-[11px]">Prospect Queue (<span id="leadCount">0</span>)</span>
+          <span class="text-[10px] text-slate-500">Click row to preview custom pitch</span>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs font-mono">
+            <thead class="bg-[#070a10] text-slate-500 uppercase text-[10px] border-b border-slate-800/80">
+              <tr>
+                <th class="py-2.5 px-3">Business</th>
+                <th class="py-2.5 px-3">Rating</th>
+                <th class="py-2.5 px-3">Identified Gap</th>
+                <th class="py-2.5 px-3">Action</th>
+              </tr>
+            </thead>
+            <tbody id="campaignTableBody" class="divide-y divide-slate-800/60">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Right: Live Pitch & 1-Click Dispatch Studio (5 Cols) -->
+      <div class="lg:col-span-5 bg-slate-900/40 border border-slate-800 rounded-lg p-4 space-y-4 font-mono text-xs">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+          <h3 class="text-xs font-semibold text-slate-200 uppercase tracking-wider">Outreach Dispatcher</h3>
+          <span id="activeBusinessBadge" class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-400">Select Row</span>
+        </div>
+
+        <div id="pitchDetailsContainer" class="space-y-4">
+          <p class="text-slate-500">Click any business in the queue to preview bespoke email and WhatsApp pitch copy.</p>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Technical Footer -->
+  <footer class="border-t border-slate-800/80 py-5 bg-[#090d16] text-xs font-mono text-slate-500">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div>
+        <span>Engineered by </span>
+        <a href="https://github.com/Vinaykumar2016" target="_blank" class="text-slate-300 hover:underline">Vinaykumar Mathad (@Vinaykumar2016)</a>
+      </div>
+      <div class="flex items-center gap-4">
+        <span>30-Day Engineering Sprint • Day 03</span>
+        <span>•</span>
+        <a href="https://poweredbyvinay.com" target="_blank" class="text-slate-400 hover:text-white">poweredbyvinay.com</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Sample Campaign Loaded directly from Day 2 Real Extracted Leads
+    const SAMPLE_LEADS = [
+      {
+        name: "Artisan Coffee House",
+        category: "Artisan Cafe",
+        rating: "4.7",
+        reviews: "450",
+        phone: "+91 98450 11223",
+        email: "contact@artisancoffee.in",
+        website: "N/A",
+        address: "Koramangala 4th Block, Bengaluru"
+      },
+      {
+        name: "Indiranagar Dental Solutions",
+        category: "Dental Clinic",
+        rating: "4.8",
+        reviews: "1836",
+        phone: "063643 12444",
+        email: "drbalu2002@dsblr.com",
+        website: "https://dentalsolutionsclinic.com",
+        address: "15th Cross, 2nd Stage, Indiranagar, Bengaluru"
+      },
+      {
+        name: "Urban Crust Pizzeria",
+        category: "Italian Restaurant",
+        rating: "3.9",
+        reviews: "120",
+        phone: "+91 97311 88990",
+        email: "N/A",
+        website: "N/A",
+        address: "100 Feet Road, Indiranagar, Bengaluru"
+      }
+    ];
+
+    let currentLeads = [];
+    let selectedLead = null;
+
+    function cleanPhone(phone) {
+      if (!phone || phone === "N/A") return null;
+      const digits = phone.replace(/\D/g, '');
+      if (digits.length === 10 && ['6','7','8','9'].includes(digits[0])) return "91" + digits;
+      if (digits.length === 11 && digits.startsWith('0')) return "91" + digits.slice(1);
+      if (digits.length === 12 && digits.startsWith('91')) return digits;
+      return digits.length >= 10 ? digits : null;
+    }
+
+    function synthesizePitch(lead) {
+      const name = lead.name || lead.business_name || "Business";
+      const cat = lead.category || "Business";
+      const rating = parseFloat(lead.rating) || 4.5;
+      const reviews = lead.reviews || lead.reviews_count || "0";
+      const website = lead.website || "N/A";
+      const hasNoWebsite = !website || website === "N/A" || website.toLowerCase().includes("no website");
+
+      let strategy = "";
+      let subject = "";
+      let email = "";
+      let wa = "";
+
+      if (hasNoWebsite) {
+        strategy = "Missing Website (Web Dev Pitch)";
+        subject = `Quick question regarding ${name} mobile menu & orders`;
+        email = `Hi Team ${name},\n\nI was looking up top-rated ${cat.toLowerCase()} places in your area and noticed your strong Google profile (${rating}★ across ${reviews} reviews).\n\nHowever, you don't have a direct mobile website or digital menu linked. When local customers search on Google Maps, many bounce to competitors who offer instant online menus.\n\nWe build ultra-fast mobile landing pages for local businesses that convert profile visitors into paying customers.\n\nWould you be open to a quick 3-minute visual mockup of how a modern site would look for ${name} this week?\n\nBest regards,\nVinaykumar Mathad\nPlainLogics | hello@poweredbyvinay.com`;
+        wa = `Hi Team *${name}*, noticed your Google profile with great reviews (${rating}★). I saw you don't have a direct mobile website linked yet. We help local businesses set up fast mobile menus to capture walk-ins. Can I share a quick 2-minute visual mockup with you today?`;
+      } else if (rating < 4.2) {
+        strategy = "Reputation Recovery (Review Funnel)";
+        subject = `Reputation automation idea for ${name}`;
+        email = `Hi Team ${name},\n\nI came across ${name} while researching local ${cat.toLowerCase()} providers. Your business has solid volume (${reviews} reviews), but the rating currently sits at ${rating}★. A sub-4.2 score often diverts 40%+ of potential high-ticket clients.\n\nWe implement lightweight WhatsApp review automation funnels that route happy customers to leave 5-star Google reviews while handling complaints privately.\n\nCould I send over a 2-minute video breakdown showing how this works?\n\nBest regards,\nVinaykumar Mathad\nPlainLogics | hello@poweredbyvinay.com`;
+        wa = `Hi Team *${name}*, noticed your presence in Bengaluru. We specialize in automated Google review funnel systems that help local businesses systematically recover their rating to 4.8★+ and boost customer trust. Open to a brief 2-minute walkthrough?`;
+      } else {
+        strategy = "Scale (24/7 WhatsApp AI Booking)";
+        subject = `Automated customer booking pipeline for ${name}`;
+        email = `Hi Team ${name},\n\nCongratulations on building such a strong reputation (${rating}★ across ${reviews} verified clients).\n\nGiven your current customer volume, our team specializes in setting up 24/7 automated WhatsApp inquiry & appointment confirmation bots that handle incoming client queries instantly without manual staff time.\n\nWe recently helped a business in your space cut booking drop-off by 35% with zero extra marketing spend.\n\nAre you open to reviewing a short 3-minute architecture overview on Tuesday?\n\nBest regards,\nVinaykumar Mathad\nPlainLogics | hello@poweredbyvinay.com`;
+        wa = `Hi Team *${name}*, congratulations on the strong ${rating}★ reputation! We build 24/7 automated WhatsApp appointment and inquiry systems for busy ${cat.toLowerCase()} teams to capture bookings on autopilot. Open to a quick 2-minute overview?`;
+      }
+
+      const pClean = cleanPhone(lead.phone || lead.phone_number);
+      const waLink = pClean ? `https://wa.me/${pClean}?text=${encodeURIComponent(wa)}` : null;
+      const mailtoLink = (lead.email && lead.email !== "N/A" && lead.email.includes('@')) 
+        ? `mailto:${lead.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(email)}` 
+        : null;
+
+      return {
+        ...lead,
+        strategy,
+        subject,
+        emailBody: email,
+        waBody: wa,
+        waLink,
+        mailtoLink
+      };
+    }
+
+    function renderCampaign() {
+      document.getElementById('leadCount').textContent = currentLeads.length;
+      const tbody = document.getElementById('campaignTableBody');
+      if (currentLeads.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-500">No leads loaded. Drop a leads.csv file above.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = currentLeads.map((item, idx) => `
+        <tr onclick="selectLead(${idx})" class="hover:bg-slate-800/40 cursor-pointer transition ${selectedLead === item ? 'bg-slate-800/60' : ''}">
+          <td class="py-2.5 px-3">
+            <div class="font-medium text-slate-200 truncate max-w-[180px]">${item.name || item.business_name}</div>
+            <div class="text-[10px] text-slate-500 truncate max-w-[180px]">${item.phone || item.phone_number || 'No Phone'}</div>
+          </td>
+          <td class="py-2.5 px-3">
+            <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] ${parseFloat(item.rating) >= 4.5 ? 'bg-emerald-950/80 text-emerald-400' : 'bg-amber-950/80 text-amber-400'}">
+              ${item.rating}★
+            </span>
+          </td>
+          <td class="py-2.5 px-3">
+            <span class="text-[10px] text-slate-300 truncate max-w-[160px] block">${item.strategy}</span>
+          </td>
+          <td class="py-2.5 px-3">
+            <button onclick="event.stopPropagation(); selectLead(${idx})" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-200 px-2 py-1 rounded border border-slate-700">
+              Inspect
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function selectLead(idx) {
+      selectedLead = currentLeads[idx];
+      renderCampaign();
+      renderPitchStudio();
+    }
+
+    function renderPitchStudio() {
+      if (!selectedLead) return;
+      document.getElementById('activeBusinessBadge').textContent = (selectedLead.name || selectedLead.business_name).substring(0, 16) + '...';
+
+      const container = document.getElementById('pitchDetailsContainer');
+      container.innerHTML = `
+        <div class="p-3 bg-[#070a10] border border-slate-800 rounded text-[11px] space-y-1">
+          <div class="font-bold text-white text-xs">${selectedLead.name || selectedLead.business_name}</div>
+          <div class="text-slate-400">Phone: <strong class="text-slate-200">${selectedLead.phone || selectedLead.phone_number || 'N/A'}</strong></div>
+          <div class="text-slate-400">Email: <strong class="text-slate-200">${selectedLead.email || 'N/A'}</strong></div>
+          <div class="text-slate-500">Angle: <strong class="text-slate-300">${selectedLead.strategy}</strong></div>
+        </div>
+
+        <!-- 1-Click WhatsApp Dispatch -->
+        <div class="space-y-1.5">
+          <div class="flex items-center justify-between text-[10px] text-slate-400 uppercase tracking-wider">
+            <span>WhatsApp Outreach Pitch:</span>
+            ${selectedLead.waLink ? `
+              <a href="${selectedLead.waLink}" target="_blank" class="bg-emerald-600 hover:bg-emerald-500 text-black font-bold px-2 py-0.5 rounded text-[10px] transition flex items-center gap-1">
+                Launch WhatsApp Web ↗
+              </a>
+            ` : `<span class="text-rose-400 text-[10px]">No Valid Mobile</span>`}
+          </div>
+          <div class="p-2.5 bg-[#070a10] border border-slate-800 rounded text-[11px] text-slate-300 leading-relaxed">
+            ${selectedLead.waBody}
+          </div>
+        </div>
+
+        <!-- 1-Click Email Dispatch -->
+        <div class="space-y-1.5">
+          <div class="flex items-center justify-between text-[10px] text-slate-400 uppercase tracking-wider">
+            <span>Targeted Cold Email:</span>
+            ${selectedLead.mailtoLink ? `
+              <a href="${selectedLead.mailtoLink}" class="bg-slate-100 hover:bg-white text-slate-950 font-bold px-2 py-0.5 rounded text-[10px] transition flex items-center gap-1">
+                Open Email Client ↗
+              </a>
+            ` : `<span class="text-amber-400 text-[10px]">No Email Found</span>`}
+          </div>
+          <div class="p-2.5 bg-[#070a10] border border-slate-800 rounded text-[11px] text-slate-300 leading-relaxed space-y-1.5">
+            <div class="text-slate-400 font-semibold border-b border-slate-800 pb-1">Sub: ${selectedLead.subject}</div>
+            <pre class="font-mono text-[10px] text-slate-300 whitespace-pre-wrap">${selectedLead.emailBody}</pre>
+          </div>
+        </div>
+      `;
+    }
+
+    function loadSampleCampaign() {
+      currentLeads = SAMPLE_LEADS.map(l => synthesizePitch(l));
+      selectedLead = currentLeads[0];
+      renderCampaign();
+      renderPitchStudio();
+    }
+
+    // CSV File Drag & Drop
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('csvFileInput');
+
+    dropZone.addEventListener('click', () => fileInput.click());
+    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('border-slate-500'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('border-slate-500'));
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('border-slate-500');
+      if (e.dataTransfer.files.length) handleCSV(e.dataTransfer.files[0]);
+    });
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files.length) handleCSV(e.target.files[0]);
+    });
+
+    function parseCSVLine(text) {
+      const p = [];
+      let cur = '';
+      let inQuotes = false;
+      for (let i = 0; i < text.length; i++) {
+        const c = text[i];
+        if (c === '"') {
+          inQuotes = !inQuotes;
+        } else if (c === ',' && !inQuotes) {
+          p.push(cur.trim().replace(/^"|"$/g, ''));
+          cur = '';
+        } else {
+          cur += c;
+        }
+      }
+      p.push(cur.trim().replace(/^"|"$/g, ''));
+      return p;
+    }
+
+    function handleCSV(file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const lines = e.target.result.split('\n').filter(l => l.trim().length > 0);
+        if (lines.length < 2) return;
+        const headers = parseCSVLine(lines[0]).map(h => h.toLowerCase());
+        
+        const nameIdx = headers.findIndex(h => h.includes('name'));
+        const catIdx = headers.findIndex(h => h.includes('category'));
+        const rateIdx = headers.findIndex(h => h.includes('rating'));
+        const revIdx = headers.findIndex(h => h.includes('review'));
+        const phoneIdx = headers.findIndex(h => h.includes('phone'));
+        const emailIdx = headers.findIndex(h => h.includes('email'));
+        const webIdx = headers.findIndex(h => h.includes('web'));
+        const addrIdx = headers.findIndex(h => h.includes('addr'));
+
+        const parsed = [];
+        for (let i = 1; i < lines.length; i++) {
+          const cols = parseCSVLine(lines[i]);
+          if (!cols[nameIdx]) continue;
+          parsed.push({
+            name: cols[nameIdx] || 'Business',
+            category: cols[catIdx] || 'Local Business',
+            rating: cols[rateIdx] || '4.5',
+            reviews: cols[revIdx] || '0',
+            phone: cols[phoneIdx] || 'N/A',
+            email: cols[emailIdx] || 'N/A',
+            website: cols[webIdx] || 'N/A',
+            address: cols[addrIdx] || 'Bengaluru'
+          });
+        }
+
+        currentLeads = parsed.map(l => synthesizePitch(l));
+        selectedLead = currentLeads[0];
+        document.getElementById('csvStatus').textContent = `Loaded ${currentLeads.length} leads from ${file.name}`;
+        renderCampaign();
+        renderPitchStudio();
+      };
+      reader.readAsText(file);
+    }
+
+    function exportCampaignCSV() {
+      if (currentLeads.length === 0) return;
+      let csvContent = "data:text/csv;charset=utf-8,business_name,category,rating,reviews,phone,email,website,strategy,subject,email_pitch,whatsapp_pitch,whatsapp_link\n";
+      currentLeads.forEach(l => {
+        csvContent += `"${l.name}","${l.category}","${l.rating}","${l.reviews}","${l.phone}","${l.email}","${l.website}","${l.strategy}","${l.subject}","${l.emailBody.replace(/\n/g, ' ')}","${l.waBody}","${l.waLink || 'N/A'}"\n`;
+      });
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "outreach_campaign_ready.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    // Initialize
+    loadSampleCampaign();
+  </script>
+</body>
+</html>
