@@ -39,12 +39,12 @@ This is a **100% free, local, open-source Python automation tool** that runs dir
 git clone https://github.com/Vinaykumar2016/30-days-ai-prototypes.git
 cd 30-days-ai-prototypes/Day02_Maps_Lead_Scraper
 
-# 2. Install dependencies
-pip install playwright
-playwright install chromium
+# 2. Install dependencies (using python -m guarantees correct path)
+python -m pip install playwright requests
+python -m playwright install chromium
 
-# 3. Run the extractor
-python scraper.py "Gyms in Indiranagar Bangalore" 25
+# 3. Run the extractor (or just double click run_scraper.bat!)
+python scraper.py
 ```
 
 ---

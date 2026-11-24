@@ -22,8 +22,29 @@ import re
 import csv
 import json
 import urllib.parse
-import requests
+import subprocess
+
+# Self-healing dependency auto-installer for zero-friction user execution
+def ensure_dependencies():
+    packages = {"playwright": "playwright", "requests": "requests"}
+    needed = []
+    for mod, pkg in packages.items():
+        try:
+            __import__(mod)
+        except ImportError:
+            needed.append(pkg)
+    if needed:
+        print(f"[*] Missing dependencies detected: {needed}")
+        print(f"[*] Auto-installing packages into active Python interpreter: {sys.executable} ...")
+        subprocess.check_call([sys.executable, "-m", "pip", "install"] + needed)
+        print("[*] Installing Chromium automation engine...")
+        subprocess.check_call([sys.executable, "-m", "playwright", "install", "chromium"])
+        print("[*] Environment verified successfully!\n")
+
+ensure_dependencies()
+
 from playwright.sync_api import sync_playwright
+import requests
 
 def clean_str(s):
     if not s:
