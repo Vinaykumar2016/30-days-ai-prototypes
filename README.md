@@ -15,6 +15,7 @@ Every day, a new practical, zero-cost AI tool or automation prototype is built a
 | **Day 01** | **95% ATS Resume Optimizer** | [Live Tool](https://poweredbyvinay.com/resume) | [Day01_ATS_Resume_Optimizer](./Day01_ATS_Resume_Optimizer) | Career / Productivity |
 | **Day 02** | **Google Maps B2B Lead Extractor** | Local Script | [Day02_Maps_Lead_Scraper](./Day02_Maps_Lead_Scraper) | Freelance / Sales Automation |
 | **Day 03** | **Autonomous B2B Cold Outreach Agent** | Local Dashboard | [Day03_Cold_Outreach_Agent](./Day03_Cold_Outreach_Agent) | Sales & WhatsApp Automation |
+| **Day 04** | **GST & Dynamic UPI Invoice Studio** | Local Web App | [Day04_GST_Invoice_Generator](./Day04_GST_Invoice_Generator) | Finance & Business Automation |
 
 ---
 

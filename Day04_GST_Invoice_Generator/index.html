@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GST & UPI Invoice Studio | Day 04 Prototype</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <!-- QRCode.js for dynamic NPCI UPI QR -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    :root {
+      --bg: #090d16;
+      --card-bg: #0f1523;
+      --border: #1e293b;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent: #38bdf8;
+      --green: #25d366;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Bar */
+    header {
+      background: #0f1523;
+      border-bottom: 1px solid var(--border);
+      padding: 14px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .badge-day {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: var(--accent);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-weight: 700;
+    }
+
+    .brand h1 {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn {
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      border: 1px solid transparent;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+
+    .btn-secondary {
+      background: #1e293b;
+      color: #f1f5f9;
+      border-color: #334155;
+    }
+    .btn-secondary:hover {
+      background: #334155;
+    }
+
+    .btn-whatsapp {
+      background: #25d366;
+      color: #030712;
+      font-weight: 700;
+      box-shadow: 0 4px 12px rgba(37, 211, 102, 0.25);
+    }
+    .btn-whatsapp:hover {
+      background: #1eb857;
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #030712;
+      font-weight: 700;
+    }
+    .btn-primary:hover {
+      background: #7dd3fc;
+      transform: translateY(-1px);
+    }
+
+    /* Container Grid */
+    .container {
+      max-width: 1360px;
+      margin: 24px auto;
+      padding: 0 24px;
+      display: grid;
+      grid-template-columns: 460px 1fr;
+      gap: 28px;
+      width: 100%;
+      align-items: start;
+    }
+
+    /* Left Form Panel */
+    .panel {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 22px;
+      height: fit-content;
+      max-height: calc(100vh - 100px);
+      overflow-y: auto;
+    }
+
+    .panel-section {
+      margin-bottom: 20px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid #1e293b;
+    }
+    .panel-section:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .panel-title {
+      font-size: 11.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--accent);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .input-group {
+      margin-bottom: 11px;
+    }
+
+    .input-group label {
+      display: block;
+      font-size: 11.5px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+      font-weight: 500;
+    }
+
+    .input-control {
+      width: 100%;
+      background: #090d16;
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .input-control:focus {
+      border-color: var(--accent);
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    /* Line Items Editor */
+    .item-edit-row {
+      background: #090d16;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 8px;
+      position: relative;
+    }
+
+    .item-edit-row .remove-btn {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      background: transparent;
+      border: none;
+      color: #ef4444;
+      cursor: pointer;
+      font-size: 16px;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .item-edit-row .remove-btn:hover {
+      background: rgba(239, 68, 68, 0.15);
+    }
+
+    /* Live Invoice Paper Sheet */
+    .preview-wrapper {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .invoice-sheet {
+      background: #ffffff;
+      color: #0f172a;
+      width: 100%;
+      max-width: 800px;
+      min-height: 1040px;
+      padding: 44px;
+      border-radius: 8px;
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.7);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .inv-header {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 20px;
+      gap: 20px;
+    }
+
+    .inv-brand h2 {
+      font-size: 22px;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.02em;
+    }
+
+    .inv-brand p {
+      font-size: 11.5px;
+      color: #475569;
+      margin-top: 4px;
+      line-height: 1.5;
+    }
+
+    .inv-title-meta {
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .inv-badge {
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: 0.05em;
+      color: #2563eb;
+    }
+
+    .inv-meta-row {
+      font-size: 11.5px;
+      color: #64748b;
+      margin-top: 4px;
+    }
+
+    .inv-meta-row strong {
+      color: #0f172a;
+    }
+
+    /* Addresses */
+    .inv-addresses {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin: 22px 0;
+    }
+
+    .addr-box h4 {
+      font-size: 10.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #64748b;
+      margin-bottom: 5px;
+    }
+
+    .addr-box p {
+      font-size: 12px;
+      color: #334155;
+      line-height: 1.5;
+    }
+
+    .addr-box strong {
+      color: #0f172a;
+      font-size: 13.5px;
+    }
+
+    /* Table */
+    .inv-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+
+    .inv-table th {
+      background: #f8fafc;
+      color: #334155;
+      font-size: 10.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 9px 12px;
+      text-align: left;
+      border-bottom: 2px solid #cbd5e1;
+    }
+
+    .inv-table th.text-right, .inv-table td.text-right {
+      text-align: right;
+    }
+
+    .inv-table td {
+      padding: 9px 12px;
+      font-size: 12px;
+      color: #1e293b;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    /* Summary */
+    .inv-summary {
+      display: grid;
+      grid-template-columns: 1fr 290px;
+      gap: 20px;
+      align-items: start;
+      margin-top: auto;
+      padding-top: 14px;
+      border-top: 2px solid #e2e8f0;
+    }
+
+    .payment-qr-card {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 12px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    #qrcode {
+      background: #fff;
+      padding: 4px;
+      border-radius: 6px;
+      border: 1px solid #94a3b8;
+      width: 84px;
+      height: 84px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #qrcode img {
+      width: 100%;
+      height: 100%;
+    }
+
+    .payment-details h4 {
+      font-size: 11px;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 3px;
+    }
+
+    .payment-details p {
+      font-size: 10px;
+      color: #475569;
+      line-height: 1.35;
+    }
+
+    .payment-details .upi-id {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      color: #2563eb;
+      margin-top: 3px;
+    }
+
+    .totals-box {
+      width: 100%;
+    }
+
+    .total-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: #475569;
+      margin-bottom: 4px;
+    }
+
+    .total-row strong {
+      color: #0f172a;
+    }
+
+    .grand-total {
+      border-top: 2px solid #0f172a;
+      padding-top: 6px;
+      margin-top: 6px;
+      font-size: 14.5px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    .amount-words {
+      font-size: 10px;
+      font-style: italic;
+      color: #64748b;
+      margin-top: 5px;
+      text-align: right;
+      line-height: 1.35;
+    }
+
+    .inv-footer {
+      margin-top: 22px;
+      padding-top: 12px;
+      border-top: 1px dashed #cbd5e1;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 10px;
+      color: #64748b;
+    }
+
+    /* Print: Guaranteed 100% Single-Page A4 with Zero Spillover */
+    @page {
+      size: A4 portrait;
+      margin: 8mm 10mm;
+    }
+
+    @media print {
+      html, body {
+        height: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: hidden !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      header, .panel, .header-actions {
+        display: none !important;
+      }
+      .container {
+        display: block !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        max-width: 100% !important;
+        width: 100% !important;
+      }
+      .preview-wrapper {
+        display: block !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+      }
+      .invoice-sheet {
+        box-shadow: none !important;
+        border: none !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        min-height: auto !important;
+        height: auto !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        page-break-inside: avoid !important;
+        page-break-after: avoid !important;
+        break-inside: avoid !important;
+      }
+      .inv-header {
+        padding-bottom: 10px !important;
+      }
+      .inv-brand h2 {
+        font-size: 19px !important;
+      }
+      .inv-badge {
+        font-size: 19px !important;
+      }
+      .inv-addresses {
+        margin: 12px 0 !important;
+        gap: 16px !important;
+      }
+      .addr-box p {
+        font-size: 11px !important;
+        line-height: 1.4 !important;
+      }
+      .inv-table {
+        margin-bottom: 10px !important;
+      }
+      .inv-table th {
+        padding: 6px 8px !important;
+        font-size: 10px !important;
+      }
+      .inv-table td {
+        padding: 6px 8px !important;
+        font-size: 10.5px !important;
+        line-height: 1.3 !important;
+      }
+      .inv-summary {
+        margin-top: 10px !important;
+        padding-top: 8px !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        gap: 16px !important;
+      }
+      .payment-qr-card {
+        padding: 8px 10px !important;
+      }
+      #qrcode {
+        width: 68px !important;
+        height: 68px !important;
+      }
+      .payment-details h4 {
+        font-size: 10.5px !important;
+      }
+      .payment-details p {
+        font-size: 9.5px !important;
+        line-height: 1.25 !important;
+      }
+      .total-row {
+        font-size: 11px !important;
+        margin-bottom: 3px !important;
+      }
+      .grand-total {
+        font-size: 13.5px !important;
+        padding-top: 4px !important;
+        margin-top: 4px !important;
+      }
+      .amount-words {
+        font-size: 9.5px !important;
+        margin-top: 4px !important;
+      }
+      .inv-footer {
+        margin-top: 12px !important;
+        padding-top: 8px !important;
+        font-size: 9px !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Bar -->
+  <header>
+    <div class="brand">
+      <span class="badge-day">DAY 04</span>
+      <h1>GST & UPI Invoice Studio</h1>
+    </div>
+    <div class="header-actions">
+      <!-- 1-Click WhatsApp Share -->
+      <button class="btn btn-whatsapp" onclick="shareToWhatsApp()">
+        <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+        Share to WhatsApp
+      </button>
+
+      <button class="btn btn-primary" onclick="window.print()">
+        <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H7a2 2 0 00-2 2v4h10z"></path></svg>
+        Print / Save PDF
+      </button>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- Form Controls -->
+    <div class="panel">
+      <!-- Biller Details -->
+      <div class="panel-section">
+        <div class="panel-title">🏢 Biller (Your Business)</div>
+        <div class="input-group">
+          <label>Business / Agency Name</label>
+          <input type="text" id="bizName" class="input-control" value="Apex Digital Studio" oninput="render()">
+        </div>
+        <div class="input-group">
+          <label>Address, City & State</label>
+          <input type="text" id="bizAddress" class="input-control" value="Congress Road, Tilakwadi, Belagavi 590006" oninput="render()">
+        </div>
+        <div class="grid-2">
+          <div class="input-group">
+            <label>Business Email</label>
+            <input type="text" id="bizEmail" class="input-control" value="billing@apexdigital.in" oninput="render()">
+          </div>
+          <div class="input-group">
+            <label>Business Phone</label>
+            <input type="text" id="bizPhone" class="input-control" value="+91 9123456789" oninput="render()">
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="input-group">
+            <label>GSTIN (Optional)</label>
+            <input type="text" id="bizGstin" class="input-control" value="29ABCDE1234F1Z5" oninput="render()">
+          </div>
+          <div class="input-group">
+            <label>State Code</label>
+            <input type="text" id="bizState" class="input-control" value="Karnataka (29)" oninput="render()">
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="input-group">
+            <label>UPI ID (For Scan & Pay)</label>
+            <input type="text" id="bizUpi" class="input-control" value="billing@okhdfcbank" oninput="render()">
+          </div>
+          <div class="input-group">
+            <label>Payee Name</label>
+            <input type="text" id="bizPayee" class="input-control" value="Apex Digital Studio" oninput="render()">
+          </div>
+        </div>
+      </div>
+
+      <!-- Client Details -->
+      <div class="panel-section">
+        <div class="panel-title">👤 Billed To (Client Details)</div>
+        <div class="input-group">
+          <label>Client Business Name</label>
+          <input type="text" id="clientName" class="input-control" value="Belagavi Healthcare & Diagnostics Center" oninput="render()">
+        </div>
+        <div class="input-group">
+          <label>Client Address / City</label>
+          <input type="text" id="clientAddress" class="input-control" value="College Road, Camp, Belagavi 590001" oninput="render()">
+        </div>
+        <div class="grid-2">
+          <div class="input-group">
+            <label>Client WhatsApp (+91)</label>
+            <input type="text" id="clientWa" class="input-control" value="9123456789" placeholder="10-digit mobile number" oninput="render()">
+          </div>
+          <div class="input-group">
+            <label>Invoice Number</label>
+            <input type="text" id="invNumber" class="input-control" value="INV-BG-2026-042" oninput="render()">
+          </div>
+        </div>
+        <div class="input-group">
+          <label>Invoice Date</label>
+          <input type="date" id="invDate" class="input-control" oninput="render()">
+        </div>
+      </div>
+
+      <!-- Line Items -->
+      <div class="panel-section">
+        <div class="panel-title">📦 Line Items & Services</div>
+        <div class="input-group">
+          <label>GST Mode</label>
+          <select id="gstType" class="input-control" onchange="render()">
+            <option value="intra" selected>Intra-State GST (CGST 9% + SGST 9% = 18%)</option>
+            <option value="inter">Inter-State GST (IGST 18%)</option>
+            <option value="none">Zero Tax / Non-GST Freelancer (0%)</option>
+          </select>
+        </div>
+
+        <div id="itemsContainer"></div>
+
+        <button class="btn btn-secondary" style="width: 100%; margin-top: 10px;" onclick="addItem()">+ Add Service Item</button>
+      </div>
+    </div>
+
+    <!-- Live Invoice Preview Sheet -->
+    <div class="preview-wrapper">
+      <div class="invoice-sheet" id="invoiceSheet">
+        <div>
+          <!-- Header -->
+          <div class="inv-header">
+            <div class="inv-brand">
+              <h2 id="viewBizName">Apex Digital Studio</h2>
+              <p id="viewBizAddress">Congress Road, Tilakwadi, Belagavi 590006</p>
+              <p id="viewBizContact">Email: billing@apexdigital.in | Phone: +91 9123456789</p>
+              <p><strong>GSTIN:</strong> <span id="viewBizGstin">29ABCDE1234F1Z5</span> | <strong>State:</strong> <span id="viewBizState">Karnataka (29)</span></p>
+            </div>
+            <div class="inv-title-meta">
+              <div class="inv-badge">TAX INVOICE</div>
+              <div class="inv-meta-row">Invoice No: <strong id="viewInvNum">INV-BG-2026-042</strong></div>
+              <div class="inv-meta-row">Date: <strong id="viewInvDate">25 Nov 2026</strong></div>
+              <div class="inv-meta-row">Payment: <strong style="color: #10b981;">Due on Receipt</strong></div>
+            </div>
+          </div>
+
+          <!-- Bill To -->
+          <div class="inv-addresses">
+            <div class="addr-box">
+              <h4>Billed To (Client):</h4>
+              <p><strong id="viewClientName">Belagavi Healthcare & Diagnostics Center</strong></p>
+              <p id="viewClientAddress">College Road, Camp, Belagavi 590001</p>
+              <p id="viewClientPhone" style="color: #64748b; font-size: 11px; margin-top: 2px;">Contact: +91 9123456789</p>
+            </div>
+            <div class="addr-box" style="text-align: right;">
+              <h4>Place of Supply:</h4>
+              <p><strong id="viewSupplyPlace">Karnataka (Code: 29)</strong></p>
+              <p style="font-size: 11px; color: #64748b;">Supply Type: B2B Technology Service</p>
+            </div>
+          </div>
+
+          <!-- Table with 5-6 realistic services -->
+          <table class="inv-table">
+            <thead>
+              <tr>
+                <th style="width: 32px;">#</th>
+                <th>Service Description</th>
+                <th class="text-right" style="width: 50px;">Qty</th>
+                <th class="text-right" style="width: 90px;">Rate (₹)</th>
+                <th class="text-right" style="width: 100px;">Amount (₹)</th>
+              </tr>
+            </thead>
+            <tbody id="viewItemsBody"></tbody>
+          </table>
+        </div>
+
+        <!-- Totals & UPI QR -->
+        <div>
+          <div class="inv-summary">
+            <!-- Payment QR Card -->
+            <div class="payment-qr-card">
+              <div id="qrcode"></div>
+              <div class="payment-details">
+                <h4>Scan to Pay (Instant UPI)</h4>
+                <p>Scan with Google Pay, PhonePe, or Paytm with exact pre-filled amount.</p>
+                <div class="upi-id" id="viewUpiId">billing@okhdfcbank</div>
+                <div style="font-size: 10px; color: #059669; font-weight: 700; margin-top: 2px;">⚡ NPCI Verified Dynamic QR</div>
+              </div>
+            </div>
+
+            <!-- Tax Calculation -->
+            <div class="totals-box">
+              <div class="total-row">
+                <span>Subtotal:</span>
+                <strong id="viewSubtotal">₹0</strong>
+              </div>
+              <div class="total-row" id="rowCgst">
+                <span>CGST (9%):</span>
+                <strong id="viewCgst">₹0</strong>
+              </div>
+              <div class="total-row" id="rowSgst">
+                <span>SGST (9%):</span>
+                <strong id="viewSgst">₹0</strong>
+              </div>
+              <div class="total-row" id="rowIgst" style="display: none;">
+                <span>IGST (18%):</span>
+                <strong id="viewIgst">₹0</strong>
+              </div>
+              <div class="total-row grand-total">
+                <span>Total Due:</span>
+                <span id="viewGrandTotal" style="color: #2563eb;">₹0</span>
+              </div>
+              <div class="amount-words" id="viewWords">Amount in words</div>
+            </div>
+          </div>
+
+          <!-- Footer -->
+          <div class="inv-footer">
+            <span>Thank you for your business! All payments via verified UPI / NEFT.</span>
+            <span>Generated via Free Invoice Studio</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 6 Realistic Tech & Creative Services
+    let items = [
+      { desc: "Custom Responsive Web Application Development", qty: 1, rate: 18000 },
+      { desc: "UI/UX Design & Interactive Mobile Prototype (Figma)", qty: 1, rate: 6000 },
+      { desc: "Cloud Database Setup & REST API Integration", qty: 1, rate: 5000 },
+      { desc: "Local Google Maps SEO & Business Verification Setup", qty: 1, rate: 3500 },
+      { desc: "WhatsApp Automated Customer Inquiry & Booking Bot", qty: 1, rate: 4000 },
+      { desc: "High-Speed Cloud Hosting & SSL Configuration (1 Year)", qty: 1, rate: 2500 }
+    ];
+
+    let currentGrandTotal = 39000;
+
+    function init() {
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('invDate').value = today;
+      renderItemsEditor();
+      render();
+    }
+
+    function renderItemsEditor() {
+      const container = document.getElementById('itemsContainer');
+      container.innerHTML = '';
+      items.forEach((item, idx) => {
+        const div = document.createElement('div');
+        div.className = 'item-edit-row';
+        div.innerHTML = `
+          <button class="remove-btn" onclick="removeItem(${idx})" title="Remove item">×</button>
+          <div class="input-group">
+            <label>Service Description</label>
+            <input type="text" class="input-control" value="${item.desc}" oninput="updateItem(${idx}, 'desc', this.value)">
+          </div>
+          <div class="grid-2">
+            <div class="input-group">
+              <label>Qty</label>
+              <input type="number" class="input-control" value="${item.qty}" min="1" oninput="updateItem(${idx}, 'qty', this.value)">
+            </div>
+            <div class="input-group">
+              <label>Rate in ₹</label>
+              <input type="number" class="input-control" value="${item.rate}" step="500" oninput="updateItem(${idx}, 'rate', this.value)">
+            </div>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function addItem() {
+      items.push({ desc: "Consulting / Additional Service", qty: 1, rate: 3000 });
+      renderItemsEditor();
+      render();
+    }
+
+    function removeItem(idx) {
+      if (items.length <= 1) return alert("Must keep at least 1 line item!");
+      items.splice(idx, 1);
+      renderItemsEditor();
+      render();
+    }
+
+    function updateItem(idx, key, val) {
+      items[idx][key] = (key === 'qty' || key === 'rate') ? parseFloat(val) || 0 : val;
+      render();
+    }
+
+    function formatINR(num) {
+      return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(num);
+    }
+
+    function numberToWords(num) {
+      const a = ['', 'One ', 'Two ', 'Three ', 'Four ', 'Five ', 'Six ', 'Seven ', 'Eight ', 'Nine ', 'Ten ', 'Eleven ', 'Twelve ', 'Thirteen ', 'Fourteen ', 'Fifteen ', 'Sixteen ', 'Seventeen ', 'Eighteen ', 'Nineteen '];
+      const b = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+
+      function inWords(n) {
+        if ((n = n.toString()).length > 9) return 'overflow';
+        let n_array = ('000000000' + n).substr(-9).match(/^(\d{2})(\d{2})(\d{2})(\d{1})(\d{2})$/);
+        if (!n_array) return '';
+        let str = '';
+        str += (n_array[1] != 0) ? (a[Number(n_array[1])] || b[n_array[1][0]] + ' ' + a[n_array[1][1]]) + 'Crore ' : '';
+        str += (n_array[2] != 0) ? (a[Number(n_array[2])] || b[n_array[2][0]] + ' ' + a[n_array[2][1]]) + 'Lakh ' : '';
+        str += (n_array[3] != 0) ? (a[Number(n_array[3])] || b[n_array[3][0]] + ' ' + a[n_array[3][1]]) + 'Thousand ' : '';
+        str += (n_array[4] != 0) ? (a[Number(n_array[4])] || b[n_array[4][0]] + ' ' + a[n_array[4][1]]) + 'Hundred ' : '';
+        str += (n_array[5] != 0) ? ((str != '') ? 'and ' : '') + (a[Number(n_array[5])] || b[n_array[5][0]] + ' ' + a[n_array[5][1]]) : '';
+        return str;
+      }
+      return inWords(Math.round(num)) + 'Rupees Only';
+    }
+
+    function render() {
+      document.getElementById('viewBizName').innerText = document.getElementById('bizName').value || 'Business Name';
+      document.getElementById('viewBizAddress').innerText = document.getElementById('bizAddress').value || '';
+      document.getElementById('viewBizContact').innerText = `Email: ${document.getElementById('bizEmail').value} | Phone: ${document.getElementById('bizPhone').value}`;
+      document.getElementById('viewBizGstin').innerText = document.getElementById('bizGstin').value || 'N/A';
+      document.getElementById('viewBizState').innerText = document.getElementById('bizState').value || 'Karnataka (29)';
+      document.getElementById('viewUpiId').innerText = document.getElementById('bizUpi').value || 'N/A';
+
+      document.getElementById('viewClientName').innerText = document.getElementById('clientName').value || 'Client Name';
+      document.getElementById('viewClientAddress').innerText = document.getElementById('clientAddress').value || '';
+      const clientPhone = document.getElementById('clientWa').value.trim();
+      document.getElementById('viewClientPhone').innerText = clientPhone ? `Contact: +91 ${clientPhone}` : '';
+
+      document.getElementById('viewInvNum').innerText = document.getElementById('invNumber').value || 'INV-001';
+
+      const d = document.getElementById('invDate').value;
+      if (d) {
+        const dateObj = new Date(d);
+        document.getElementById('viewInvDate').innerText = dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+      }
+
+      // Calculate Items
+      let subtotal = 0;
+      const tbody = document.getElementById('viewItemsBody');
+      tbody.innerHTML = '';
+
+      items.forEach((item, i) => {
+        const lineTotal = item.qty * item.rate;
+        subtotal += lineTotal;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${i + 1}</td>
+          <td><strong>${item.desc}</strong></td>
+          <td class="text-right">${item.qty}</td>
+          <td class="text-right">₹${item.rate.toLocaleString('en-IN')}</td>
+          <td class="text-right"><strong>₹${lineTotal.toLocaleString('en-IN')}</strong></td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      // Calculate Taxes
+      const gstType = document.getElementById('gstType').value;
+      let cgst = 0, sgst = 0, igst = 0;
+
+      if (gstType === 'intra') {
+        cgst = subtotal * 0.09;
+        sgst = subtotal * 0.09;
+        document.getElementById('rowCgst').style.display = 'flex';
+        document.getElementById('rowSgst').style.display = 'flex';
+        document.getElementById('rowIgst').style.display = 'none';
+      } else if (gstType === 'inter') {
+        igst = subtotal * 0.18;
+        document.getElementById('rowCgst').style.display = 'none';
+        document.getElementById('rowSgst').style.display = 'none';
+        document.getElementById('rowIgst').style.display = 'flex';
+      } else {
+        document.getElementById('rowCgst').style.display = 'none';
+        document.getElementById('rowSgst').style.display = 'none';
+        document.getElementById('rowIgst').style.display = 'none';
+      }
+
+      currentGrandTotal = subtotal + cgst + sgst + igst;
+
+      document.getElementById('viewSubtotal').innerText = formatINR(subtotal);
+      document.getElementById('viewCgst').innerText = formatINR(cgst);
+      document.getElementById('viewSgst').innerText = formatINR(sgst);
+      document.getElementById('viewIgst').innerText = formatINR(igst);
+      document.getElementById('viewGrandTotal').innerText = formatINR(currentGrandTotal);
+      document.getElementById('viewWords').innerText = numberToWords(currentGrandTotal);
+
+      updateQr(currentGrandTotal);
+    }
+
+    let qrCodeInstance = null;
+    function updateQr(totalAmount) {
+      const upi = document.getElementById('bizUpi').value.trim();
+      const payee = encodeURIComponent(document.getElementById('bizPayee').value.trim());
+      const amt = (totalAmount || 39000).toFixed(2);
+
+      const upiUri = `upi://pay?pa=${upi}&pn=${payee}&am=${amt}&cu=INR&tn=Invoice%20Payment`;
+
+      const qrContainer = document.getElementById('qrcode');
+      qrContainer.innerHTML = '';
+      qrCodeInstance = new QRCode(qrContainer, {
+        text: upiUri,
+        width: 78,
+        height: 78,
+        colorDark: "#0f172a",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.M
+      });
+    }
+
+    // Direct 1-Click WhatsApp Share
+    function shareToWhatsApp() {
+      const client = document.getElementById('clientName').value.trim() || 'Client';
+      const rawPhone = document.getElementById('clientWa').value.replace(/[^0-9]/g, '');
+      const invNum = document.getElementById('invNumber').value.trim();
+      const upi = document.getElementById('bizUpi').value.trim();
+      const biller = document.getElementById('bizName').value.trim();
+      const totalStr = formatINR(currentGrandTotal);
+
+      if (!rawPhone || rawPhone.length < 10) {
+        alert("Please enter a valid 10-digit Client WhatsApp number!");
+        document.getElementById('clientWa').focus();
+        return;
+      }
+
+      const phone = rawPhone.length === 10 ? `91${rawPhone}` : rawPhone;
+
+      const itemLines = items.map((it) => `• ${it.desc} (Qty: ${it.qty}) - ₹${(it.qty * it.rate).toLocaleString('en-IN')}`).join('\n');
+
+      const message = `Hi *${client}*,\n\nHere is your official invoice details:\n\n📄 *Invoice No:* ${invNum}\n💰 *Total Due:* ${totalStr}\n\n*Services:*\n${itemLines}\n\n⚡ *Instant UPI Payment:* ${upi}\n(Or scan the dynamic QR code on the invoice PDF)\n\nThank you,\n*${biller}*`;
+
+      const waUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+      window.open(waUrl, '_blank');
+    }
+
+    window.onload = init;
+  </script>
+</body>
+</html>
