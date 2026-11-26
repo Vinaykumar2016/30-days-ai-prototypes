@@ -1,7 +1,8 @@
 # 🧾 Day 4: Freelancer GST & UPI Invoice Generator
 
 > Built by **Vinaykumar Mathad** ([@Vinaykumar2016](https://github.com/Vinaykumar2016) / [@poweredbyvinay](https://instagram.com/poweredbyvinay))  
-> Part of the **30 Days / 30 AI Prototypes Challenge**
+> Part of the **30 Days / 30 AI Prototypes Challenge**  
+> 🌐 **Live Web Tool:** [https://poweredbyvinay.com/invoicegenerator/](https://poweredbyvinay.com/invoicegenerator/)
 
 ---
 
